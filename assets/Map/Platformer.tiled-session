@@ -3,10 +3,25 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "Level 1.tmx",
     "expandedProjectPaths": [
+        "."
     ],
     "fileStates": {
+        "": {
+            "scaleInEditor": 2
+        },
+        "Level 1.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 940,
+                "y": 182
+            }
+        },
+        "Level 1.tmx#monochrome_tilemap_packed": {
+            "scaleInDock": 2
+        }
     },
     "last.imagePath": "C:/Users/jplam/Documents/GitHub/CMPM 120/CMPM-120-Game-3-Platformer/assets",
     "map.lastUsedFormat": "tmx",
@@ -14,9 +29,11 @@
     "map.tileWidth": 16,
     "map.width": 120,
     "openFiles": [
+        "Level 1.tmx"
     ],
     "project": "Platformer.tiled-project",
     "recentFiles": [
+        "Level 1.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

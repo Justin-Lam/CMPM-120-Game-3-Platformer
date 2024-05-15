@@ -1,7 +1,6 @@
 // debug with extreme prejudice
 "use strict"
 
-// game config
 let config = {
     parent: 'phaser-game',
     type: Phaser.CANVAS,
@@ -9,10 +8,20 @@ let config = {
     render: {
         pixelArt: true  // prevent pixel art from getting blurred when scaled
     },
-    width: 600,
-    height: 800,
+    physics: {
+        default: "arcade",
+        arcade: {
+            gravity: {
+                x: 0,
+                y: 0
+            },
+            debug: true
+        }
+    },
+    width: 16 * 100,
+    height: 9 * 100,
     autoCenter: true,
-    scene: [Game]
+    scene: [Load, Level1]
 }
 
 const game = new Phaser.Game(config);
