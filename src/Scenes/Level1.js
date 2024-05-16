@@ -7,8 +7,13 @@ class Level1 extends Phaser.Scene {
 	PLAYER_AIR_DRAG_MULTIPLIER = 0.25;
 	PLAYER_TURNING_ACCELERATION_MULTIPLIER = 2.0;
 	PLAYER_MAX_VELOCITY = 500;	
+
+	ANGULAR_VELOCITY = 50;
+	TURNING_ANGULAR_VELOCITY_MULTIPLIER = 2.0;
+
 	PLAYER_JUMP_VELOCITY = -1500;
 	PLAYER_TERMINAL_VELOCITY = 3000;
+	hasJump = true;
 
 	COYOTE_TIME_DURATION = 0.075;		// in seconds
 	JUMP_BUFFER_DURATION = 0.075;		// in seconds
@@ -40,8 +45,6 @@ class Level1 extends Phaser.Scene {
 
 
 
-
-
 		// Create a rectangular platform using a graphics object
         const platformWidth = 400;
         const platformHeight = 20;
@@ -69,24 +72,37 @@ class Level1 extends Phaser.Scene {
 		// Move Left
 		if (this.moveLeftKey.isDown)
 		{
-			// Fast Turning
-			if (this.player.body.velocity.x > 0)
+			// Movement
+			if (this.player.body.velocity.x > 0)		// fast turning
 			{
 				this.player.body.setAccelerationX(-this.PLAYER_ACCELERATION * this.PLAYER_TURNING_ACCELERATION_MULTIPLIER);
 			}
-			// Normal Acceleration
-			else
+			else										// normal acceleration
 			{
 				this.player.body.setAccelerationX(-this.PLAYER_ACCELERATION);
 			}
 
-			// Cap Velocity
-			if (this.player.body.velocity.x < -this.PLAYER_MAX_VELOCITY)
+			if (this.player.body.velocity.x < -this.PLAYER_MAX_VELOCITY)		// cap velocity
 			{
 				this.player.body.setVelocityX(-this.PLAYER_MAX_VELOCITY);
 			}
 
-			// Visuals
+			// Rotation
+			if (this.player.angle > 0)		// fast turning
+			{
+				this.player.setAngularVelocity(-this.ANGULAR_VELOCITY * this.TURNING_ANGULAR_VELOCITY_MULTIPLIER);
+			}
+			else							// normal velocity
+			{
+				this.player.setAngularVelocity(-this.ANGULAR_VELOCITY);
+			}
+
+			if (this.player.angle < -5)		// cap angle
+			{
+				this.player.angle = -5;
+			}
+
+			// Animation
 			this.player.setFlip(true, false);
 			this.player.anims.play("Player Move", true);
 		}
@@ -94,24 +110,37 @@ class Level1 extends Phaser.Scene {
 		// Move Right
 		else if (this.moveRightKey.isDown)
 		{
-			// Fast Turning
-			if (this.player.body.velocity.x < 0)
+			// Movement
+			if (this.player.body.velocity.x < 0)		// fast turning
 			{
 				this.player.body.setAccelerationX(this.PLAYER_ACCELERATION * this.PLAYER_TURNING_ACCELERATION_MULTIPLIER);
 			}
-			// Normal Acceleration
-			else
+			else										// normal acceleration
 			{
 				this.player.body.setAccelerationX(this.PLAYER_ACCELERATION);
 			}
 
-			// Cap Velocity
-			if (this.player.body.velocity.x > this.PLAYER_MAX_VELOCITY)
+			if (this.player.body.velocity.x > this.PLAYER_MAX_VELOCITY)		// cap velocity
 			{
 				this.player.body.setVelocityX(this.PLAYER_MAX_VELOCITY);
 			}
 
-			// Visuals
+			// Rotation
+			if (this.player.angle < 0)		// fast turning
+			{
+				this.player.setAngularVelocity(this.ANGULAR_VELOCITY * this.TURNING_ANGULAR_VELOCITY_MULTIPLIER);
+			}
+			else							// normal velocity
+			{
+				this.player.setAngularVelocity(this.ANGULAR_VELOCITY);
+			}
+
+			if (this.player.angle > 5)		// cap angle
+			{
+				this.player.angle = 5;
+			}
+
+			// Animation
 			this.player.resetFlip();
 			this.player.anims.play("Player Move", true);
 		}
@@ -119,20 +148,39 @@ class Level1 extends Phaser.Scene {
 		// Idle
 		else
 		{
+			// Movement
 			this.player.body.setAccelerationX(0);
 
-			// Player on ground
-			if (this.player.body.blocked.down)
+			if (this.player.body.blocked.down)		// player on ground
 			{
 				this.player.body.setDragX(this.PLAYER_DRAG);
 			}
-			// Player in air
-			else
+			else									// player in air
 			{
 				this.player.body.setDragX(this.PLAYER_DRAG * this.PLAYER_AIR_DRAG_MULTIPLIER);
 			}
 
-			// Visuals
+			// Rotation
+			this.player.setAngularVelocity(0);
+
+			if (this.player.angle < 0)
+			{
+				this.player.angle += 1;
+				if (this.player.angle > 0)
+				{
+					this.player.angle = 0;
+				}
+			}
+			else if (this.player.angle > 0)
+			{
+				this.player.angle -= 1;
+				if (this.player.angle < 0)
+				{
+					this.player.angle = 0;
+				}
+			}
+
+			// Animation
 			this.player.anims.play("Player Idle", true);
 		}
 	}
@@ -155,7 +203,7 @@ class Level1 extends Phaser.Scene {
 		}
 
 		// Jump Buffer
-		if (this.jumpKey.isDown)
+		if (this.jumpKey.isDown && this.hasJump)
 		{
 			this.jumpBufferCounter = this.JUMP_BUFFER_DURATION;
 		}
@@ -170,10 +218,11 @@ class Level1 extends Phaser.Scene {
 		}
 
 		// Jump
-		if (this.coyoteTimeCounter > 0 && this.jumpBufferCounter > 0)
+		if (this.coyoteTimeCounter > 0 && this.jumpBufferCounter > 0 && this.hasJump)
 		{
 			this.coyoteTimeCounter = 0;
 			this.jumpBufferCounter = 0;
+			this.hasJump = false;
 			this.player.body.setVelocityY(this.PLAYER_JUMP_VELOCITY);
 		}
 
@@ -204,6 +253,12 @@ class Level1 extends Phaser.Scene {
 		{
 			console.log("NOTIFICAITON: Player exceeded terminal velocity");
 			this.player.body.setVelocityY(this.PLAYER_TERMINAL_VELOCITY);
+		}
+
+		// Get Jump Back
+		if (this.jumpKey.isUp)
+		{
+			this.hasJump = true;
 		}
 	}
 }
