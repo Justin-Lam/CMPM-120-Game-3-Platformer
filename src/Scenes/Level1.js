@@ -7,12 +7,12 @@ class Level1 extends Phaser.Scene {
 	PLAYER_AIR_DRAG_MULTIPLIER = 0.25;
 	PLAYER_TURNING_ACCELERATION_MULTIPLIER = 2.0;
 	PLAYER_MAX_VELOCITY = 500;	
-	PLAYER_JUMP_VELOCITY = -1750;
+	PLAYER_JUMP_VELOCITY = -1500;
 	PLAYER_TERMINAL_VELOCITY = 3000;
 
-	coyoteTimeDuration = 0.075;		// in seconds
+	COYOTE_TIME_DURATION = 0.075;		// in seconds
+	JUMP_BUFFER_DURATION = 0.075;		// in seconds
 	coyoteTimeCounter = 0;
-	jumpBufferDuration = 0.075;		// in seconds
 	jumpBufferCounter = 0;
 
 
@@ -52,7 +52,7 @@ class Level1 extends Phaser.Scene {
         
         // Create a static physics body for the platform
         const platformTexture = platform.generateTexture('platformTexture', platformWidth, platformHeight);
-        this.platformSprite = this.physics.add.staticSprite(500, 600, 'platformTexture');
+        this.platformSprite = this.physics.add.staticSprite(500, 650, 'platformTexture');
 
 		// Enable collision between the player and the platform
         this.physics.add.collider(this.player, this.platformSprite);
@@ -142,7 +142,7 @@ class Level1 extends Phaser.Scene {
 		// Coyote Time
 		if (this.player.body.blocked.down)		// on ground
 		{
-			this.coyoteTimeCounter = this.coyoteTimeDuration;
+			this.coyoteTimeCounter = this.COYOTE_TIME_DURATION;
 		}
 		else									// not on ground
 		{
@@ -157,7 +157,7 @@ class Level1 extends Phaser.Scene {
 		// Jump Buffer
 		if (this.jumpKey.isDown)
 		{
-			this.jumpBufferCounter = this.jumpBufferDuration;
+			this.jumpBufferCounter = this.JUMP_BUFFER_DURATION;
 		}
 		else
 		{
@@ -184,26 +184,22 @@ class Level1 extends Phaser.Scene {
 		}
 
 		// Variable Jumping Height
-		/*
 		if (this.jumpKey.isUp && this.player.body.velocity.y < 0)
 		{
-			this.player.body.velocity.y /= 2;
+			this.player.body.velocity.y *= 0.8;
 		}
-		*/
 
-		// Down Gravity and Variable Jumping Height
-		if (!this.player.body.blocked.down && (this.jumpKey.isUp || this.player.body.velocity.y > 0))
+		// Down Gravity
+		if (this.player.body.velocity.y > 0)
 		{
 			this.player.body.setGravityY(this.WORLD_GRAVITY);
 		}
-
-		// Reset Down Gravity
-		if (this.player.body.blocked.down)
+		else
 		{
 			this.player.body.setGravityY(0);
 		}
 
-		// Cap Velocity
+		// Terminal Velocity Cap
 		if (this.player.body.velocity.y > this.PLAYER_TERMINAL_VELOCITY)
 		{
 			console.log("NOTIFICAITON: Player exceeded terminal velocity");
