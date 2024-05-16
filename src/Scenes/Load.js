@@ -6,19 +6,13 @@ class Load extends Phaser.Scene {
 
 	preload()
 	{
-		// Load map
-		/*
-		this.load.path = './assets/Map/';
-		this.load.image("Tilemap", "monochrome_tilemap_packed.png");
-		this.load.tilemapTiledJSON("Level 1", "Level 1.tmj");
-		*/
-
-		// Load player
-		this.load.path = './assets/Player/';
-		this.load.image("Player 0", "0.png");
-		this.load.image("Player 1", "1.png");
-		this.load.image("Player 2", "2.png");
-		this.load.image("Player 3", "3.png");
+		this.load.path = './assets/';
+		this.load.image("Tilemap Default Image", "monochrome_tilemap_packed.png");
+		this.load.tilemapTiledJSON("Level 1 JSON", "Level 1.tmj");
+		this.load.spritesheet("Tilemap Transparent Spritesheet", "monochrome_tilemap_transparent_packed.png", {
+			frameWidth: 16,
+			frameHeight: 16
+		});
 	}
 
 	create()
@@ -26,28 +20,33 @@ class Load extends Phaser.Scene {
 		// Create animations
 		this.anims.create({
 			key: "Player Idle",
-			frames: [
-				{ key: "Player 0" }
-			],
-			repeat: -1
+			repeat: -1,
+			frames: [{ key: "Tilemap Transparent Spritesheet", frame: 261 }]
+			/*
+			frames: this.anims.generateFrameNumbers("Tilemap Transparent Spritesheet", {
+				start: 261,
+				end: 261
+			})
+			*/
 		});
 		this.anims.create({
 			key: "Player Move",
+			frameRate: 18,
+			repeat: -1,
 			frames: [
-				{ key: "Player 1" },
-				{ key: "Player 2" },
-				{ key: "Player 3" },
-				{ key: "Player 0" }
-			],
-			frameRate: 10,
-			repeat: -1
+				{ key: "Tilemap Transparent Spritesheet", frame: 262 },
+				{ key: "Tilemap Transparent Spritesheet", frame: 263 },
+				{ key: "Tilemap Transparent Spritesheet", frame: 264 },
+				{ key: "Tilemap Transparent Spritesheet", frame: 264 },
+				{ key: "Tilemap Transparent Spritesheet", frame: 263 },
+				{ key: "Tilemap Transparent Spritesheet", frame: 262 },
+				{ key: "Tilemap Transparent Spritesheet", frame: 261 }
+			]
 		});
 		this.anims.create({
 			key: "Player Jump",
-			frames: [
-				{ key: "Player 3" }
-			],
-			repeat: -1
+			repeat: -1,
+			frames: [{ key: "Tilemap Transparent Spritesheet", frame: 264 }]
 		});
 
 		// Start the first scene

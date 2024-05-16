@@ -6,9 +6,14 @@ class Level1 extends Phaser.Scene {
 	PLAYER_DRAG = 2500;
 	PLAYER_AIR_DRAG_MULTIPLIER = 0.25;
 	PLAYER_TURNING_ACCELERATION_MULTIPLIER = 2.0;
-	PLAYER_MAX_VELOCITY = 500;
+	PLAYER_MAX_VELOCITY = 500;	
 	PLAYER_JUMP_VELOCITY = -1750;
 	PLAYER_TERMINAL_VELOCITY = 3000;
+
+	coyoteTimeDuration = 0.075;		// in seconds
+	coyoteTimeCounter = 0;
+	jumpBufferDuration = 0.075;		// in seconds
+	jumpBufferCounter = 0;
 
 
 	constructor()
@@ -20,36 +25,46 @@ class Level1 extends Phaser.Scene {
 	{
 		this.physics.world.gravity.y = this.WORLD_GRAVITY;
 
-		/*
-		this.map = this.add.tilemap("Level 1", 16, 16, 120, 20);
-		this.tileset = this.map.addTilesetImage("monochrome_tilemap_packed", "Tilemap");
-		this.groundLayer = this.map.createLayer("Ground and Platforms", this.tileset, 0, 0);
-		this.groundLayer.setScale(2.8);
-		this.groundLayer.setCollisionByProperty({ collides: true });
-		*/
-
 		this.moveLeftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 		this.moveRightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 		this.jumpKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
 
 		this.#initialize();
 	}
 
 	#initialize()
 	{
-		this.player = this.physics.add.sprite(0, 400, "Player 0");
+		this.player = this.physics.add.sprite(0, 400, "Tilemap Transparent Spritesheet", 261);
 		this.player.setScale(5);
 		this.player.setCollideWorldBounds(true);
+
+
+
+
+
+		// Create a rectangular platform using a graphics object
+        const platformWidth = 400;
+        const platformHeight = 20;
+        const platform = this.add.graphics();
+        platform.fillStyle(0x00ff00, 1);
+        platform.fillRect(0, 0, platformWidth, platformHeight);
+		platform.setVisible(false);
+        
+        // Create a static physics body for the platform
+        const platformTexture = platform.generateTexture('platformTexture', platformWidth, platformHeight);
+        this.platformSprite = this.physics.add.staticSprite(500, 600, 'platformTexture');
+
+		// Enable collision between the player and the platform
+        this.physics.add.collider(this.player, this.platformSprite);
 	}
 
-	update()
+	update(time, delta)
 	{
 		this.#playerMovement();
-		this.#playerJump();
+		this.#playerJump(delta);
 	}
 
-	#playerMovement()
+	#playerMovement(delta)
 	{
 		// Move Left
 		if (this.moveLeftKey.isDown)
@@ -122,11 +137,43 @@ class Level1 extends Phaser.Scene {
 		}
 	}
 
-	#playerJump()
+	#playerJump(delta)
 	{
-		// Jump
-		if (this.jumpKey.isDown && this.player.body.blocked.down)
+		// Coyote Time
+		if (this.player.body.blocked.down)		// on ground
 		{
+			this.coyoteTimeCounter = this.coyoteTimeDuration;
+		}
+		else									// not on ground
+		{
+			this.coyoteTimeCounter -= delta/1000;
+
+			if (this.coyoteTimeCounter < 0)
+			{
+				this.coyoteTimeCounter = 0;
+			}
+		}
+
+		// Jump Buffer
+		if (this.jumpKey.isDown)
+		{
+			this.jumpBufferCounter = this.jumpBufferDuration;
+		}
+		else
+		{
+			this.jumpBufferCounter -= delta/1000;
+
+			if (this.jumpBufferCounter < 0)
+			{
+				this.jumpBufferCounter = 0;
+			}
+		}
+
+		// Jump
+		if (this.coyoteTimeCounter > 0 && this.jumpBufferCounter > 0)
+		{
+			this.coyoteTimeCounter = 0;
+			this.jumpBufferCounter = 0;
 			this.player.body.setVelocityY(this.PLAYER_JUMP_VELOCITY);
 		}
 
@@ -136,7 +183,15 @@ class Level1 extends Phaser.Scene {
 			this.player.anims.play("Player Jump", true);
 		}
 
-		// Down Gravity
+		// Variable Jumping Height
+		/*
+		if (this.jumpKey.isUp && this.player.body.velocity.y < 0)
+		{
+			this.player.body.velocity.y /= 2;
+		}
+		*/
+
+		// Down Gravity and Variable Jumping Height
 		if (!this.player.body.blocked.down && (this.jumpKey.isUp || this.player.body.velocity.y > 0))
 		{
 			this.player.body.setGravityY(this.WORLD_GRAVITY);
@@ -150,9 +205,9 @@ class Level1 extends Phaser.Scene {
 
 		// Cap Velocity
 		if (this.player.body.velocity.y > this.PLAYER_TERMINAL_VELOCITY)
-			{
-				console.log("NOTIFICAITON: Player exceeded terminal velocity");
-				this.player.body.setVelocityY(this.PLAYER_TERMINAL_VELOCITY);
-			}
+		{
+			console.log("NOTIFICAITON: Player exceeded terminal velocity");
+			this.player.body.setVelocityY(this.PLAYER_TERMINAL_VELOCITY);
+		}
 	}
 }
