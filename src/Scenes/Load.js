@@ -1,4 +1,5 @@
-class Load extends Phaser.Scene {
+class Load extends Phaser.Scene
+{
 	constructor()
 	{
 		super('loadScene')
@@ -13,6 +14,8 @@ class Load extends Phaser.Scene {
 			frameWidth: 16,
 			frameHeight: 16
 		});
+
+		this.load.audio("Player Jump", "Player Jump.wav");
 	}
 
 	create()
