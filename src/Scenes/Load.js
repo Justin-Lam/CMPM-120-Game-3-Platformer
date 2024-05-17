@@ -7,7 +7,10 @@ class Load extends Phaser.Scene
 
 	preload()
 	{
+		// Set load path
 		this.load.path = './assets/';
+
+		// Load default and transparent tilemaps
 		this.load.image("Tilemap Default Image", "monochrome_tilemap_packed.png");
 		this.load.tilemapTiledJSON("Level 1 JSON", "Level 1.tmj");
 		this.load.spritesheet("Tilemap Transparent Spritesheet", "monochrome_tilemap_transparent_packed.png", {
@@ -15,6 +18,7 @@ class Load extends Phaser.Scene
 			frameHeight: 16
 		});
 
+		// Load audio
 		this.load.audio("Player Jump", "Player Jump.wav");
 	}
 

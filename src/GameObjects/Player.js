@@ -1,15 +1,15 @@
 class Player extends Phaser.Physics.Arcade.Sprite
 {
 	// Constant Variables
-	#ACCELERATION = 2500;
-	#DRAG = 2500;
+	#ACCELERATION = 500;
+	#DRAG = 500;
 	#TURNING_ACCELERATION_MULTIPLIER = 2.0;
-	#MAX_VELOCITY = 500;
+	#MAX_VELOCITY = 100;
 	#AIR_DRAG_MULTIPLIER = 0.25;
 	#ANGULAR_VELOCITY = 50;
 	#TURNING_ANGULAR_VELOCITY_MULTIPLIER = 2.0;
-	#JUMP_VELOCITY = -1500;
-	#TERMINAL_VELOCITY = 3000;
+	#JUMP_VELOCITY = -300;
+	#TERMINAL_VELOCITY = 600;
 	#COYOTE_TIME_DURATION = 0.075;		// in seconds
 	#JUMP_BUFFER_DURATION = 0.075;		// in seconds
 	
@@ -30,16 +30,19 @@ class Player extends Phaser.Physics.Arcade.Sprite
 		super(scene, x, y, "Tilemap Transparent Spritesheet", 261)
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
-		this.setScale(this.scene.SCALE);
 		this.setCollideWorldBounds(true);
+
+		this.#moveLeftKey = this.scene.moveLeftKey;
+		this.#moveRightKey = this.scene.moveRightKey;
+		this.#jumpKey = this.scene.jumpKey;
+
 		return this;
 	}
 
-	initialize(moveLeftKey, moveRightKey, jumpKey)
+	reset()
 	{
-		this.#moveLeftKey = moveLeftKey;
-		this.#moveRightKey = moveRightKey;
-		this.#jumpKey = jumpKey;
+		this.texture = "Tilemap Transparent Spritesheet";
+		this.frame = 261;
 	}
 
 	update(delta)
