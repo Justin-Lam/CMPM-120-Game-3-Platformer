@@ -2,12 +2,13 @@ class Player extends Phaser.Physics.Arcade.Sprite
 {
 	// Constant Variables
 	#ACCELERATION = 500;
-	#DRAG = 500;
 	#TURNING_ACCELERATION_MULTIPLIER = 2.0;
-	#MAX_VELOCITY = 100;
+	#DRAG = 500;
 	#AIR_DRAG_MULTIPLIER = 0.25;
-	#ANGULAR_VELOCITY = 50;
+	#MAX_VELOCITY = 100;
+	#ANGULAR_VELOCITY = 15;
 	#TURNING_ANGULAR_VELOCITY_MULTIPLIER = 2.0;
+	#MAX_TURN_ANGLE = 2;
 	#JUMP_VELOCITY = -300;
 	#TERMINAL_VELOCITY = 600;
 	#COYOTE_TIME_DURATION = 0.075;		// in seconds
@@ -39,7 +40,7 @@ class Player extends Phaser.Physics.Arcade.Sprite
 		return this;
 	}
 
-	reset()
+	start()
 	{
 		this.texture = "Tilemap Transparent Spritesheet";
 		this.frame = 261;
@@ -81,9 +82,9 @@ class Player extends Phaser.Physics.Arcade.Sprite
 				this.setAngularVelocity(-this.#ANGULAR_VELOCITY);
 			}
 
-			if (this.angle < -5)		// cap angle
+			if (this.angle < -this.#MAX_TURN_ANGLE)		// cap angle
 			{
-				this.angle = -5;
+				this.angle = -this.#MAX_TURN_ANGLE;
 			}
 
 			// Animation
@@ -119,9 +120,9 @@ class Player extends Phaser.Physics.Arcade.Sprite
 				this.setAngularVelocity(this.#ANGULAR_VELOCITY);
 			}
 
-			if (this.angle > 5)		// cap angle
+			if (this.angle > this.#MAX_TURN_ANGLE)		// cap angle
 			{
-				this.angle = 5;
+				this.angle = this.#MAX_TURN_ANGLE;
 			}
 
 			// Animation

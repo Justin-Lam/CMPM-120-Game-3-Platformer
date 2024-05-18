@@ -19,12 +19,22 @@ class Load extends Phaser.Scene
 		});
 
 		// Load audio
+		this.load.audio("Collect Pixel", "Collect Pixel.wav");
 		this.load.audio("Player Jump", "Player Jump.wav");
 	}
 
 	create()
 	{
 		// Create animations
+		this.anims.create({
+			key: "Pixel",
+			frameRate: 3,
+			repeat: -1,
+			frames: [
+				{ key: "Tilemap Transparent Spritesheet", frame: 20 },
+				{ key: "Tilemap Transparent Spritesheet", frame: 21 },
+			]
+		});
 		this.anims.create({
 			key: "Player Idle",
 			repeat: -1,
