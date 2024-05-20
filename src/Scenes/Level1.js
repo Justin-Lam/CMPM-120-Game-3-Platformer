@@ -22,6 +22,10 @@ class Level1 extends Phaser.Scene
 	decorationsLayer = null;
 	fallDeathZone = null;
 
+	// Particles
+	playerMoveParticles = null;
+	playerJumpParticles
+
 	// Game Objects
 	start = null;
 	end = null;
@@ -61,6 +65,26 @@ class Level1 extends Phaser.Scene
 		// Create fall death zone
 		this.fallDeathZone = this.physics.add.staticSprite(this.map.widthInPixels/2, this.map.heightInPixels + 10/2)
 		this.fallDeathZone.setSize(this.map.widthInPixels, 10);
+
+		// Create particles
+		this.playerMoveParticles = this.add.particles(0, 0, "Particles Multialtas", {
+			frame: ["smoke_03.png", "smoke_06.png"],
+			scale: {start: 0.01, end: 0.03},
+			maxAliveParticles: 3,
+			lifespan: 250,
+			gravityY: -50,
+			alpha: {start: 1, end: 0.1}
+		});
+		this.playerMoveParticles.stop();
+		this.playerJumpParticles = this.add.particles(0, 0, "Particles Multialtas", {
+			frame: "smoke_09.png",
+			scale: {start: 0.01, end: 0.05},
+			lifespan: 400,
+			stopAfter: 1,
+			gravityY: -50,
+			alpha: {start: 1, end: 0.1}
+		});
+		this.playerJumpParticles.stop();
 
 		// Create start and end
 		this.start = this.map.createFromObjects("Start and End", {

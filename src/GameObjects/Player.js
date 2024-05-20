@@ -12,7 +12,7 @@ class Player extends Phaser.Physics.Arcade.Sprite
 	#JUMP_VELOCITY = -300;
 	#TERMINAL_VELOCITY = 600;
 	#COYOTE_TIME_DURATION = 0.075;		// in seconds
-	#JUMP_BUFFER_DURATION = 0.075;		// in seconds
+	#JUMP_BUFFER_DURATION = 0.1;		// in seconds
 	
 	// Dynamic Variables
 	#hasJump = true;
@@ -23,6 +23,8 @@ class Player extends Phaser.Physics.Arcade.Sprite
 	#moveLeftKey = null;
 	#moveRightKey = null;
 	#jumpKey = null;
+	#moveParticles = null;
+	#jumpParticles = null;
 
 
 	// Methods
@@ -36,6 +38,14 @@ class Player extends Phaser.Physics.Arcade.Sprite
 		this.#moveLeftKey = scene.moveLeftKey;
 		this.#moveRightKey = scene.moveRightKey;
 		this.#jumpKey = scene.jumpKey;
+		this.#moveParticles = scene.playerMoveParticles;
+		this.#jumpParticles = scene.playerJumpParticles;
+
+		this.#jumpKey.on("down", (key, event) => {
+			if (this.#hasJump) {
+				this.#jumpBufferCounter = this.#JUMP_BUFFER_DURATION;
+			}
+		});
 
 		return this;
 	}
@@ -90,6 +100,16 @@ class Player extends Phaser.Physics.Arcade.Sprite
 			// Animation
 			this.setFlip(true, false);
 			this.anims.play("Player Move", true);
+
+			// Particles
+			this.#moveParticles.startFollow(this, this.displayWidth/2 - 10, this.displayHeight-10);
+			if (this.body.blocked.down) {
+				this.#moveParticles.start();
+			}
+			else
+			{
+				this.#moveParticles.stop();
+			}
 		}
 
 		// Move Right
@@ -128,6 +148,16 @@ class Player extends Phaser.Physics.Arcade.Sprite
 			// Animation
 			this.resetFlip();
 			this.anims.play("Player Move", true);
+
+			// Particles
+			this.#moveParticles.startFollow(this, -this.displayWidth/2 + 10, this.displayHeight-10);
+			if (this.body.blocked.down) {
+				this.#moveParticles.start();
+			}
+			else
+			{
+				this.#moveParticles.stop();
+			}
 		}
 
 		// Idle
@@ -167,6 +197,9 @@ class Player extends Phaser.Physics.Arcade.Sprite
 
 			// Animation
 			this.anims.play("Player Idle", true);
+
+			// Particles
+			this.#moveParticles.stop();
 		}
 	}
 
@@ -177,7 +210,7 @@ class Player extends Phaser.Physics.Arcade.Sprite
 		{
 			this.#coyoteTimeCounter = this.#COYOTE_TIME_DURATION;
 		}
-		else									// not on ground
+		else							// not on ground
 		{
 			this.#coyoteTimeCounter -= delta/1000;
 
@@ -188,11 +221,7 @@ class Player extends Phaser.Physics.Arcade.Sprite
 		}
 
 		// Jump Buffer
-		if (this.#jumpKey.isDown && this.#hasJump)
-		{
-			this.#jumpBufferCounter = this.#JUMP_BUFFER_DURATION;
-		}
-		else
+		if (this.#jumpBufferCounter > 0)
 		{
 			this.#jumpBufferCounter -= delta/1000;
 
@@ -210,7 +239,8 @@ class Player extends Phaser.Physics.Arcade.Sprite
 			this.#hasJump = false;
 
 			this.body.setVelocityY(this.#JUMP_VELOCITY);
-
+			this.#jumpParticles.setPosition(this.x, this.y + this.displayHeight-10);
+			this.#jumpParticles.start();
 			this.scene.sound.play("Player Jump");
 		}
 

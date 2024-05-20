@@ -10,6 +10,9 @@ class Load extends Phaser.Scene
 		// Set load path
 		this.load.path = './assets/';
 
+		// Load particles
+		this.load.multiatlas("Particles Multialtas", "kenny-particles.json");
+
 		// Load default and transparent tilemaps
 		this.load.image("Tilemap Default Image", "monochrome_tilemap_packed.png");
 		this.load.image("Tilemap Transparent Image", "monochrome_tilemap_transparent_packed.png");
