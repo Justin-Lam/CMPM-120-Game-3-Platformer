@@ -16,8 +16,6 @@ class Level1 extends Phaser.Scene
 
 	// Map
 	map = null;
-	defaultTilesetImage = null;
-	transparentTilesetImage = null;
 	tilesetImages = [];
 	backgroundLayer = null;
 	groundAndPlatformsLayer = null;
@@ -49,9 +47,10 @@ class Level1 extends Phaser.Scene
 
 		// Create map
 		this.map = this.add.tilemap("Level 1 JSON", 16, 16, 120, 20);
-		this.defaultTilesetImage = this.map.addTilesetImage("monochrome_tilemap_packed", "Tilemap Default Image");
-		this.transparentTilesetImage = this.map.addTilesetImage("monochrome_tilemap_transparent_packed", "Tilemap Transparent Image");
-		this.tilesetImages = [this.defaultTilesetImage, this.transparentTilesetImage];
+		this.tilesetImages = [
+			this.map.addTilesetImage("monochrome_tilemap_packed", "Tilemap Default Image"),
+			this.map.addTilesetImage("monochrome_tilemap_transparent_packed", "Tilemap Transparent Image")
+		];
 		this.backgroundLayer = this.map.createLayer("Background", this.tilesetImages, 0, 0);
 		this.groundAndPlatformsLayer = this.map.createLayer("Ground and Platforms", this.tilesetImages, 0, 0);
 		this.groundAndPlatformsLayer.setCollisionByExclusion([-1], true);
