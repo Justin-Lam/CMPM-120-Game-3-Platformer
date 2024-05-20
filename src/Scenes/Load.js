@@ -20,6 +20,8 @@ class Load extends Phaser.Scene
 		});
 
 		// Load audio
+		this.load.audio("Fall Death", "Fall Death.wav");
+		this.load.audio("Victory", "Victory.wav");
 		this.load.audio("Collect Pixel", "Collect Pixel.wav");
 		this.load.audio("Player Jump", "Player Jump.wav");
 	}
@@ -68,6 +70,6 @@ class Load extends Phaser.Scene
 		});
 
 		// Start the first scene
-		this.scene.start('level1Scene')
+		this.scene.start("level1Scene")
 	}
 }

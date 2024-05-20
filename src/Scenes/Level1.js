@@ -23,6 +23,8 @@ class Level1 extends Phaser.Scene
 	fallDeathZone = null;
 
 	// Game Objects
+	start = null;
+	end = null;
 	pixelGroup = null;
 	player = null;
 	pixelHUDElement = null;
@@ -60,19 +62,43 @@ class Level1 extends Phaser.Scene
 		this.fallDeathZone = this.physics.add.staticSprite(this.map.widthInPixels/2, this.map.heightInPixels + 10/2)
 		this.fallDeathZone.setSize(this.map.widthInPixels, 10);
 
+		// Create start and end
+		this.start = this.map.createFromObjects("Start and End", {
+			name: "Start",
+			key: "Tilemap Transparent Spritesheet",
+			frame: 56
+		})[0];
+		this.end = this.map.createFromObjects("Start and End", {
+			name: "End",
+			key: "Tilemap Transparent Spritesheet",
+			frame: 58
+		})[0];
+		this.physics.world.enable(this.end, Phaser.Physics.Arcade.STATIC_BODY);
+		const endBodyWidth = 2;
+		const endBodyHeight = 2;
+		this.end.body.setSize(endBodyWidth, endBodyHeight);
+		this.end.body.setOffset(this.end.displayWidth - endBodyWidth, this.end.displayHeight/2);
+
 		// Create pixels
 		this.pixelGroup = this.physics.add.staticGroup();
 		for (let pixel of this.map.getObjectLayer("Pixels").objects) {
 			this.pixelGroup.add(new Pixel(this, pixel.x, pixel.y));
 		}
 
+		// Create enemies
+
 		// Create player
-		this.player = new Player(this, 0, 0);
+		this.player = new Player(this, this.start.x, this.start.y);
 
 		// Create colliders
 		this.physics.add.collider(this.player, this.groundAndPlatformsLayer);
 		this.physics.add.collider(this.player, this.fallDeathZone, () => {
+			this.sound.play("Fall Death");
 			this.startLevel();
+		});
+		this.physics.add.overlap(this.player, this.end, (player, end) => {
+			this.sound.play("Victory");
+			this.scene.start("victoryScene");
 		});
 		this.physics.add.overlap(this.player, this.pixelGroup, (player, pixel) => {
 			pixel.onPlayerCollide();
@@ -85,7 +111,7 @@ class Level1 extends Phaser.Scene
 		this.cameras.main.setZoom(this.SCALE);
 
 		// Set HUD
-		this.pixelHUDElement = new PixelHUDElement(this, 610, 348);
+		this.pixelHUDElement = new PixelHUDElement(this, (610*this.game.canvas.width)/1600, (348*this.game.canvas.height)/900);
 
 		// Start level
 		this.startLevel();
@@ -99,7 +125,7 @@ class Level1 extends Phaser.Scene
 		}
 		
 		// Player
-		this.player.setPosition(0, 0);
+		this.player.setPosition(this.start.x, this.start.y);
 		this.player.start();
 
 		// HUD
