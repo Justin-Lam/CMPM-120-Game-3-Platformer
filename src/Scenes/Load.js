@@ -12,6 +12,7 @@ class Load extends Phaser.Scene
 
 		// Load default and transparent tilemaps
 		this.load.image("Tilemap Default Image", "monochrome_tilemap_packed.png");
+		this.load.image("Tilemap Transparent Image", "monochrome_tilemap_transparent_packed.png");
 		this.load.tilemapTiledJSON("Level 1 JSON", "Level 1.tmj");
 		this.load.spritesheet("Tilemap Transparent Spritesheet", "monochrome_tilemap_transparent_packed.png", {
 			frameWidth: 16,

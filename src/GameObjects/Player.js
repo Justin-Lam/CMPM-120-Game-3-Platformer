@@ -33,17 +33,17 @@ class Player extends Phaser.Physics.Arcade.Sprite
 		scene.physics.add.existing(this);
 		this.setCollideWorldBounds(true);
 
-		this.#moveLeftKey = this.scene.moveLeftKey;
-		this.#moveRightKey = this.scene.moveRightKey;
-		this.#jumpKey = this.scene.jumpKey;
+		this.#moveLeftKey = scene.moveLeftKey;
+		this.#moveRightKey = scene.moveRightKey;
+		this.#jumpKey = scene.jumpKey;
 
 		return this;
 	}
 
 	start()
 	{
-		this.texture = "Tilemap Transparent Spritesheet";
-		this.frame = 261;
+		// Face right
+		this.resetFlip();
 	}
 
 	update(delta)

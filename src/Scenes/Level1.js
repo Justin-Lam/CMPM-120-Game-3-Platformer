@@ -1,5 +1,5 @@
 /* TODO:
-	pixel class
+	make transparent decorations appear again
 	map text for game title, controls
 */
 
@@ -16,21 +16,18 @@ class Level1 extends Phaser.Scene
 
 	// Map
 	map = null;
-	mapTileset = null;
+	defaultTilesetImage = null;
+	transparentTilesetImage = null;
+	tilesetImages = [];
 	backgroundLayer = null;
 	groundAndPlatformsLayer = null;
 	decorationsLayer = null;
 	fallDeathZone = null;
 
 	// Game Objects
-	pixels = [];
 	pixelGroup = null;
 	player = null;
-
-	// HUD
-	playerPixels = 0;
-	pixelHUDImage = null;
-	pixelHUDText = null;
+	pixelHUDElement = null;
 
 
 	// Methods
@@ -52,28 +49,23 @@ class Level1 extends Phaser.Scene
 
 		// Create map
 		this.map = this.add.tilemap("Level 1 JSON", 16, 16, 120, 20);
-		this.mapTileset = this.map.addTilesetImage("monochrome_tilemap_packed", "Tilemap Default Image");
-		this.backgroundLayer = this.map.createLayer("Background", this.mapTileset, 0, 0);
-		this.groundAndPlatformsLayer = this.map.createLayer("Ground and Platforms", this.mapTileset, 0, 0);
+		this.defaultTilesetImage = this.map.addTilesetImage("monochrome_tilemap_packed", "Tilemap Default Image");
+		this.transparentTilesetImage = this.map.addTilesetImage("monochrome_tilemap_transparent_packed", "Tilemap Transparent Image");
+		this.tilesetImages = [this.defaultTilesetImage, this.transparentTilesetImage];
+		this.backgroundLayer = this.map.createLayer("Background", this.tilesetImages, 0, 0);
+		this.groundAndPlatformsLayer = this.map.createLayer("Ground and Platforms", this.tilesetImages, 0, 0);
 		this.groundAndPlatformsLayer.setCollisionByExclusion([-1], true);
-		this.decorationsLayer = this.map.createLayer("Decorations", this.mapTileset, 0, 0);
+		this.decorationsLayer = this.map.createLayer("Decorations", this.tilesetImages, 0, 0);
 
 		// Create fall death zone
 		this.fallDeathZone = this.physics.add.staticSprite(this.map.widthInPixels/2, this.map.heightInPixels + 10/2)
 		this.fallDeathZone.setSize(this.map.widthInPixels, 10);
 
 		// Create pixels
-		this.pixels = this.map.createFromObjects("Pixels", {
-			key: "Tilemap Transparent Spritesheet",
-			frame: 20
-		});
-		this.physics.world.enable(this.pixels, Phaser.Physics.Arcade.STATIC_BODY);
-		for (let pixel of this.pixels)
-		{
-			pixel.body.setSize(10, 10);
-			pixel.anims.play("Pixel");
+		this.pixelGroup = this.physics.add.staticGroup();
+		for (let pixel of this.map.getObjectLayer("Pixels").objects) {
+			this.pixelGroup.add(new Pixel(this, pixel.x, pixel.y));
 		}
-		this.pixelGroup = this.add.group(this.pixels);
 
 		// Create player
 		this.player = new Player(this, 0, 0);
@@ -84,13 +76,7 @@ class Level1 extends Phaser.Scene
 			this.startLevel();
 		});
 		this.physics.add.overlap(this.player, this.pixelGroup, (player, pixel) => {
-			if (pixel.visible)
-			{
-				pixel.setVisible(false);
-				this.playerPixels++;
-				this.pixelHUDText.setText(this.playerPixels);
-				this.sound.play("Collect Pixel");
-			}
+			pixel.onPlayerCollide();
 		});
 
 		// Set main camera
@@ -100,15 +86,7 @@ class Level1 extends Phaser.Scene
 		this.cameras.main.setZoom(this.SCALE);
 
 		// Set HUD
-		this.pixelHUDImage = this.add.sprite(610, 348, "Tilemap Transparent Spritesheet", 20);
-		this.pixelHUDImage.setScrollFactor(0, 0);
-		this.pixelHUDText = this.add.text(615, 348, this.playerPixels, {
-			fontFamily: "Silkscreen"
-		});
-		this.pixelHUDText.setOrigin(0, 0.5);
-		this.pixelHUDText.setScale(1/this.SCALE);
-		this.pixelHUDText.setFontSize(25);
-		this.pixelHUDText.setScrollFactor(0, 0);
+		this.pixelHUDElement = new PixelHUDElement(this, 610, 348);
 
 		// Start level
 		this.startLevel();
@@ -117,16 +95,16 @@ class Level1 extends Phaser.Scene
 	startLevel()
 	{
 		// Pixels
-		this.playerPixels = 0;
-		this.pixelHUDText.setText(this.playerPixels);
-		for (let pixel of this.pixels)
-		{
-			pixel.setVisible(true);
+		for (let pixel of this.pixelGroup.getChildren()) {
+			pixel.start();
 		}
 		
 		// Player
 		this.player.setPosition(0, 0);
 		this.player.start();
+
+		// HUD
+		this.pixelHUDElement.start();
 	}
 
 	update(time, delta)
