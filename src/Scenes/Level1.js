@@ -6,7 +6,7 @@
 class Level1 extends Phaser.Scene
 {
 	// Constants
-	SCALE = 4;
+	SCALE = 3;
 	WORLD_GRAVITY = 600;
 
 	// Input
@@ -135,10 +135,14 @@ class Level1 extends Phaser.Scene
 		this.cameras.main.setZoom(this.SCALE);
 
 		// Set HUD
-		this.pixelHUDElement = new PixelHUDElement(this, (610*this.game.canvas.width)/1600, (348*this.game.canvas.height)/900);
+		//this.pixelHUDElement = new PixelHUDElement(this, (610*this.game.canvas.width)/1600, (348*this.game.canvas.height)/900);		// SCALE = 4
+		this.pixelHUDElement = new PixelHUDElement(this, (550*this.game.canvas.width)/1600, (318*this.game.canvas.height)/900);			// SCALE = 3
 
 		// Start level
 		this.startLevel();
+
+		// Make the player jump
+		this.player.forceJump();
 	}
 
 	startLevel()

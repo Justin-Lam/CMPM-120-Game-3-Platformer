@@ -21,7 +21,7 @@ let config = {
 	width: 16 * 70,
 	height: 9 * 70,
 	autoCenter: true,
-	scene: [Load, Level1, Victory]
+	scene: [Load, TitleScreen, Level1, Victory]
 }
 
 const game = new Phaser.Game(config);

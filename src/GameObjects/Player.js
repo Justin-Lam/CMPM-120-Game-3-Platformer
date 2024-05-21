@@ -279,4 +279,16 @@ class Player extends Phaser.Physics.Arcade.Sprite
 			this.#hasJump = true;
 		}
 	}
+
+	forceJump()
+	{
+		this.#coyoteTimeCounter = 0;
+		this.#jumpBufferCounter = 0;
+		this.#hasJump = false;
+
+		this.body.setVelocityY(this.#JUMP_VELOCITY*2);
+		this.#jumpParticles.setPosition(this.x, this.y + this.displayHeight-10);
+		this.#jumpParticles.start();
+		this.scene.sound.play("Player Jump");
+	}
 }
