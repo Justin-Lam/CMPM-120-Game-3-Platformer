@@ -32,6 +32,7 @@ class Victory extends Phaser.Scene
 		this.congratulationsText.setOrigin(0.5, 0.5);
 		this.congratulationsText.setAlign("center");
 		this.congratulationsText.setFontSize(50);
+		this.congratulationsText.setVisible(false);
 
 		this.returnText = this.add.text(game.config.width/2, game.config.height/2 + 50, "(Press SPACE to return to title screen)", {
 			fontFamily: "Silkscreen"

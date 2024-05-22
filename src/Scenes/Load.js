@@ -26,6 +26,8 @@ class Load extends Phaser.Scene
 		this.load.audio("Fall Death", "Fall Death.wav");
 		this.load.audio("Victory", "Victory.wav");
 		this.load.audio("Collect Pixel", "Collect Pixel.wav");
+		this.load.audio("Enemy Death", "Enemy Death.wav");
+		this.load.audio("Player Death", "Player Death.wav");
 		this.load.audio("Player Jump", "Player Jump.wav");
 	}
 
@@ -38,7 +40,25 @@ class Load extends Phaser.Scene
 			repeat: -1,
 			frames: [
 				{ key: "Tilemap Transparent Spritesheet", frame: 20 },
-				{ key: "Tilemap Transparent Spritesheet", frame: 21 },
+				{ key: "Tilemap Transparent Spritesheet", frame: 21 }
+			]
+		});
+		this.anims.create({
+			key: "Walker",
+			frameRate: 3,
+			repeat: -1,
+			frames: [
+				{ key: "Tilemap Transparent Spritesheet", frame: 321 },
+				{ key: "Tilemap Transparent Spritesheet", frame: 322 }
+			]
+		});
+		this.anims.create({
+			key: "Flyer",
+			frameRate: 3,
+			repeat: -1,
+			frames: [
+				{ key: "Tilemap Transparent Spritesheet", frame: 383 },
+				{ key: "Tilemap Transparent Spritesheet", frame: 384 }
 			]
 		});
 		this.anims.create({

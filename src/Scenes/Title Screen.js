@@ -44,6 +44,7 @@ class TitleScreen extends Phaser.Scene
 			this.map.addTilesetImage("monochrome_tilemap_transparent_packed", "Tilemap Transparent Image")
 		];
 		this.backgroundLayer = this.map.createLayer("Background", this.tilesetImages, 0, 0);
+		this.backgroundLayer.setScrollFactor(0.1, 1);
 		this.groundAndPlatformsLayer = this.map.createLayer("Ground and Platforms", this.tilesetImages, 0, 0);
 		this.groundAndPlatformsLayer.setCollisionByExclusion([-1], true);
 		this.decorationsLayer = this.map.createLayer("Decorations", this.tilesetImages, 0, 0);

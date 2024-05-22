@@ -15,6 +15,7 @@ class Player extends Phaser.Physics.Arcade.Sprite
 	#JUMP_BUFFER_DURATION = 0.1;		// in seconds
 	
 	// Dynamic Variables
+	#controllable = true;
 	#hasJump = true;
 	#coyoteTimeCounter = 0;
 	#jumpBufferCounter = 0;
@@ -30,10 +31,12 @@ class Player extends Phaser.Physics.Arcade.Sprite
 	// Methods
 	constructor(scene, x, y)
 	{
-		super(scene, x, y, "Tilemap Transparent Spritesheet", 261)
+		super(scene, x, y, "Tilemap Transparent Spritesheet", 261);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 		this.setCollideWorldBounds(true);
+
+		this.body.setMaxVelocityX(this.#MAX_VELOCITY);
 
 		this.#moveLeftKey = scene.moveLeftKey;
 		this.#moveRightKey = scene.moveRightKey;
@@ -52,14 +55,52 @@ class Player extends Phaser.Physics.Arcade.Sprite
 
 	start()
 	{
-		// Face right
+		this.#controllable = true;
+		this.body.setAngularVelocity(0);
+		this.setAngle(0);
 		this.resetFlip();
+	}
+
+	die()
+	{
+		this.#controllable = false;
+
+		this.body.setAccelerationX(0);
+		this.body.setDragX(0);
+		this.setAngle(0);
+		this.#moveParticles.stop();
+
+		this.body.setGravityY(0);
+		this.#jumpParticles.stop();
+
+		this.anims.stop();
+		this.setFrame(265);
+
+		this.forceJump(1);
+		if (this.body.velocity.x == 0)
+		{
+			let direction = 0;
+			if (Math.random() < 0.5) {
+				direction = -1;
+			}
+			else {
+				direction = 1;
+			}
+			this.body.setVelocityX(50 * direction);
+		}
+		this.body.setAngularVelocity(720 * Math.sign(this.body.velocity.x));
+
+
+		this.scene.sound.play("Player Death");
 	}
 
 	update(delta)
 	{
-		this.#movement();
-		this.#jump(delta);
+		if (this.#controllable)
+		{
+			this.#movement();
+			this.#jump(delta);
+		}
 	}
 
 	#movement()
@@ -75,11 +116,6 @@ class Player extends Phaser.Physics.Arcade.Sprite
 			else										// normal acceleration
 			{
 				this.body.setAccelerationX(-this.#ACCELERATION);
-			}
-
-			if (this.body.velocity.x < -this.#MAX_VELOCITY)		// cap velocity
-			{
-				this.body.setVelocityX(-this.#MAX_VELOCITY);
 			}
 
 			// Rotation
@@ -123,11 +159,6 @@ class Player extends Phaser.Physics.Arcade.Sprite
 			else										// normal acceleration
 			{
 				this.body.setAccelerationX(this.#ACCELERATION);
-			}
-
-			if (this.body.velocity.x > this.#MAX_VELOCITY)		// cap velocity
-			{
-				this.body.setVelocityX(this.#MAX_VELOCITY);
 			}
 
 			// Rotation
@@ -280,15 +311,8 @@ class Player extends Phaser.Physics.Arcade.Sprite
 		}
 	}
 
-	forceJump()
+	forceJump(jumpVelocityMultiplier)
 	{
-		this.#coyoteTimeCounter = 0;
-		this.#jumpBufferCounter = 0;
-		this.#hasJump = false;
-
-		this.body.setVelocityY(this.#JUMP_VELOCITY*2);
-		this.#jumpParticles.setPosition(this.x, this.y + this.displayHeight-10);
-		this.#jumpParticles.start();
-		this.scene.sound.play("Player Jump");
+		this.body.setVelocityY(this.#JUMP_VELOCITY * jumpVelocityMultiplier);
 	}
 }
